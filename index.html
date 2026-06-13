@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YouTube Clone</title>
+    <link rel="shortcut icon" href="img/logo.png" type="image/x-icon" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style>
+      body {
+        font-family: "Roboto", Arial, sans-serif;
+        background: #fafafa;
+      }
+
+      /* scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+      /* header/search */
+      .search-box { max-width: 600px; flex-grow: 1; }
+      .search-input { border-radius: 40px 0 0 40px; border: 1px solid #ccc; border-right: none; }
+      .search-btn { border-radius: 0 40px 40px 0; border: 1px solid #ccc; background-color: #f8f8f8; }
+      .mic-btn { border-radius: 50%; background-color: #f1f1f1; margin-left: 8px; }
+
+      /* sidebar */
+      .sidebar { overflow:auto; border-right:1px solid #ddd; height: 92vh; padding-top: 1rem; }
+
+      /* video thumbnails */
+      .video-thumb { position: relative; overflow: hidden; border-radius: 8px; }
+      .video-thumb img {
+        width: 100%;
+        height: 200px;                /* consistent thumbnail height */
+        object-fit: cover;
+        display: block;
+      }
+      /* duration badge */
+      .video-duration {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        background: rgba(0,0,0,0.85);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 7px;
+        border-radius: 4px;
+      }
+
+      /* clickable text (blue, no underline) */
+      .video-link {
+        color: #065fd4;
+        text-decoration: none;
+      }
+      .video-link:hover {
+        color: #0549b0; /* slightly darker on hover */
+        text-decoration: none; /* important: no underline on hover */
+      }
+
+      .card-body { padding-left: 0; padding-right: 0; } /* tighten spacing like YouTube */
+      .card-title { margin-bottom: 6px; font-size: 15px; font-weight: 600; }
+      .video-desc { margin: 0 0 6px 0; font-size: 13px; }
+      .channel-name { font-size: 13px; color: #606060; margin-bottom: 2px; }
+      .video-stats { font-size: 13px; color: #606060; margin-bottom: 0; }
+
+      /* responsive tweaks */
+      @media (max-width: 768px) {
+        .video-thumb img { height: 160px; }
+        .sidebar { display: none; } /* keep sidebar hidden on narrow screens (optional) */
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Outer Start -->
+    <div class="container-fluid">
+      <!-- Top Navbar -->
+      <div class="row align-items-center border-bottom px-3 py-2" style="height: 8vh;">
+        <!-- Left Logo -->
+        <div class="col-md-2 d-flex align-items-center gap-2">
+          <i class="fa fa-bars fs-5"></i>
+          <i class="fa-brands fa-youtube fs-4 text-danger"></i>
+          <span class="fw-bold fs-4">YouTube</span><sup>IN</sup>
+        </div>
+
+        <!-- Center Search -->
+        <div class="col-md-6 d-flex justify-content-center">
+          <div class="d-flex search-box w-100">
+            <input type="text" class="form-control search-input" placeholder="Search" />
+            <button class="btn search-btn"><i class="fa fa-search"></i></button>
+          </div>
+          <button class="btn mic-btn ms-2"><i class="fa fa-microphone"></i></button>
+        </div>
+
+        <!-- Right Icons -->
+        <div class="col-md-4 d-flex justify-content-end align-items-center gap-3">
+          <i class="fa-solid fa-ellipsis-vertical fs-5"></i>
+          <button class="btn btn-outline-light text-primary rounded-pill border d-flex align-items-center px-3">
+            <i class="fa fa-circle-user me-2"></i> Sign in
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="row" style="height: 92vh;">
+        <!-- Sidebar (left) -->
+        <div class="col-lg-2 col-md-3 d-none d-md-block sidebar">
+          <ul class="list-unstyled ps-2">
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa fa-home me-2"></i> Home</a></li>
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa-solid fa-bolt me-2 text-dark"></i> Shorts</a></li>
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa fa-bell me-2"></i> Subscriptions</a></li>
+            <hr />
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa fa-book me-2"></i> Library</a></li>
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa fa-history me-2"></i> History</a></li>
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa fa-video me-2"></i> Your Videos</a></li>
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa fa-list me-2"></i> Playlists</a></li>
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa fa-clock me-2"></i> Watch Later</a></li>
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa fa-thumbs-up me-2"></i> Liked Videos</a></li>
+            <li class="p-2"><a class="nav-link d-flex align-items-center" href=""><i class="fa fa-scissors me-2"></i> Your Clips</a></li>
+          </ul>
+        </div>
+
+        <!-- Video Cards Grid -->
+        <div class="col-lg-10 col-md-9 col-12 pt-4" style="overflow:auto;">
+          <div class="row row-cols-1 row-cols-md-3 g-4">
+
+            <!-- ========== Card 1 (v6) ========== -->
+            <div class="col">
+              <div class="card h-100 border-0">
+                <div class="video-thumb">
+                  <img src="img/v6.jpg" class="card-img-top" alt="Softpro India thumbnail">
+                  <span class="video-duration">12:34</span>
+                </div>
+                <div class="card-body">
+                  <!-- Title (long) clickable & blue -->
+                  <h5 class="card-title">
+                    <a class="video-link" href="vid/vd6.mp4" target="_blank">
+                      Softpro India Now in Noida | Celebrating 21 Years of Excellence – A Special Message from Our CEO
+                    </a>
+                  </h5>
+                  <!-- Channel name -->
+                  <div class="channel-name">Softpro India</div>
+                  <!-- Views + time -->
+                  <div class="video-stats">2.1M views • 3 months ago</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Card 2 (v3) ========== -->
+            <div class="col">
+              <div class="card h-100 border-0">
+                <div class="video-thumb">
+                  <img src="img/v3.jpg" class="card-img-top" alt="Maruf Mohammad Jisan thumbnail">
+                  <span class="video-duration">05:20</span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a class="video-link" href="vid/vd1.mp4" target="_blank">
+                      Wedding Nasheed - Maruf Mohammad Jisan | عروسة النور
+                    </a>
+                  </h5>
+                  <div class="channel-name">Maruf Mohammad Jisan</div>
+                  <div class="video-stats">830K views • 2 years ago</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Card 3 (v1) ========== -->
+            <div class="col">
+              <div class="card h-100 border-0">
+                <div class="video-thumb">
+                  <img src="img/v1.jpg" class="card-img-top" alt="NABY thumbnail">
+                  <span class="video-duration">08:45</span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a class="video-link" href="vid/vd3.mp4" target="_blank">
+                      [ASMR]🌋파도+화산+빙하+우주 자르기🌊 | Sliced Nature Series
+                    </a>
+                  </h5>
+                  <div class="channel-name">NABY</div>
+                  <div class="video-stats">1.4M views • 1 year ago</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Card 4 (v4) ========== -->
+            <div class="col">
+              <div class="card h-100 border-0">
+                <div class="video-thumb">
+                  <img src="img/v4.jpg" class="card-img-top" alt="Apple Australia thumbnail">
+                  <span class="video-duration">04:16</span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a class="video-link" href="vid/vd4.mp4" target="_blank">
+                      Emergency SOS on Apple Watch | Rick’s Rescue | Apple
+                    </a>
+                  </h5>
+                  <div class="channel-name">Apple Australia</div>
+                  <div class="video-stats">3.2M views • 6 months ago</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Card 5 (v5) ========== -->
+            <div class="col">
+              <div class="card h-100 border-0">
+                <div class="video-thumb">
+                  <img src="img/v5.jpg" class="card-img-top" alt="Samsung India thumbnail">
+                  <span class="video-duration">03:50</span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a class="video-link" href="vid/vd5.mp4" target="_blank">
+                      Introducing Galaxy S23 FE | Epic starts here | Samsung
+                    </a>
+                  </h5>
+                  <div class="channel-name">Samsung India</div>
+                  <div class="video-stats">900K views • 4 months ago</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Card 6 (v2) ========== -->
+            <div class="col">
+              <div class="card h-100 border-0">
+                <div class="video-thumb">
+                  <img src="img/v2.jpg" class="card-img-top" alt="Cities, Nature and Relaxing Music thumbnail">
+                  <span class="video-duration">10:00</span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a class="video-link" href="vid/vd2.mp4" target="_blank">
+                      Delhi 4k - INDIA 🇮🇳 Capital 4K Ultra HD Drone Video | Delhi 4K Aerial View
+                    </a>
+                  </h5>
+                  <div class="channel-name">Cities, Nature and Relaxing Music</div>
+                  <div class="video-stats">2.6M views • 1 year ago</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Card 7 (v7) ========== -->
+            <div class="col">
+              <div class="card h-100 border-0">
+                <div class="video-thumb">
+                  <img src="img/v7.jpg" class="card-img-top" alt="BMW INDIA thumbnail">
+                  <span class="video-duration">07:22</span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a class="video-link" href="vid/vd7.mp4" target="_blank">
+                      🎬 The Soul of BMW | Luxury Meets Power
+                    </a>
+                  </h5>
+                  <div class="channel-name">BMW INDIA</div>
+                  <div class="video-stats">1.1M views • 8 months ago</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Card 8 (v8) ========== -->
+            <div class="col">
+              <div class="card h-100 border-0">
+                <div class="video-thumb">
+                  <img src="img/v8.jpg" class="card-img-top" alt="Aramco Saudia thumbnail">
+                  <span class="video-duration">06:03</span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a class="video-link" href="vid/vd8.mp4" target="_blank">
+                      How can we deliver energy to a world that can’t stop?
+                    </a>
+                  </h5>
+                  <div class="channel-name">Aramco Saudia</div>
+                  <div class="video-stats">450K views • 2 years ago</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ========== Card 9 (v9) ========== -->
+            <div class="col">
+              <div class="card h-100 border-0">
+                <div class="video-thumb">
+                  <img src="img/v9.jpg" class="card-img-top" alt="Dawah Track thumbnail">
+                  <span class="video-duration">02:03</span>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <a class="video-link" href="vid/vd9.mp4" target="_blank">
+                      Arafat day 🕋 | Hajj Mubarak 2025
+                    </a>
+                  </h5>
+                  <div class="channel-name">Dawah Track</div>
+                  <div class="video-stats">120K views • 1 month ago</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- add more cards here if needed (follow same structure) -->
+
+          </div> <!-- end grid -->
+        </div>
+      </div>
+    </div>
+    <!-- Outer End -->
+
+    <!-- Bootstrap JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
